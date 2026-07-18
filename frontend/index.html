@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SneakerAI - 스니커즈 리셀 AI 투자 분석</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- D3.js + Word Cloud -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-cloud@1.2.7/build/d3.layout.cloud.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 네비게이션 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-icon">👟</span>
+                <span class="logo-text">SneakerAI</span>
+            </div>
+            <div class="nav-links">
+                <a href="#" data-page="home" class="nav-link active">홈</a>
+                <a href="#" data-page="trending" class="nav-link">인기 목록</a>
+                <a href="#" data-page="recommendations" class="nav-link">추천 Top10</a>
+                <a href="#" data-page="analyzer" class="nav-link">분석하기</a>
+                <a href="#" data-page="how-it-works" class="nav-link">작동원리</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- PAGE: 홈 -->
+    <div class="page active" id="page-home">
+        <!-- 히어로 섹션 -->
+        <section id="hero" class="hero">
+            <div class="hero-content">
+                <div class="hero-badge">🤖 AI 기반 리셀 투자 분석 플랫폼</div>
+                <h1 class="hero-title">
+                    스니커즈 사진 한 장으로<br>
+                    <span class="gradient-text">리셀 투자 가치를 분석</span>합니다
+                </h1>
+                <p class="hero-subtitle">
+                    GPT-4o 비전 모델이 신발을 인식하고, 시계열 예측 AI가 미래 가격을 예측하며,<br>
+                    LLM이 전문 투자 리포트를 작성합니다.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#" data-page="analyzer" class="btn btn-primary">지금 분석하기 →</a>
+                    <a href="#" data-page="how-it-works" class="btn btn-outline">작동 원리 보기</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">95%+</span>
+                        <span class="stat-label">모델 인식률</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">30일</span>
+                        <span class="stat-label">가격 예측</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">5초</span>
+                        <span class="stat-label">분석 완료</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 트렌드 워드클라우드 -->
+        <section class="wordcloud-section">
+            <div class="container">
+                <h2 class="section-title">🔥 실시간 트렌드 키워드</h2>
+                <div class="wordcloud-container" id="wordcloud-container">
+                    <svg id="wordcloud-svg"></svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- 기능 소개 섹션 -->
+        <section id="features" class="features">
+            <div class="container">
+                <h2 class="section-title">AI 파이프라인</h2>
+                <p class="section-subtitle">사진 업로드부터 투자 추천까지 5단계 AI가 자동으로 분석합니다</p>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📸</div>
+                        <h3>이미지 업로드</h3>
+                        <p>스니커즈 사진을 업로드하면 AI가 자동으로 분석을 시작합니다</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🧠</div>
+                        <h3>비전 AI 인식</h3>
+                        <p>GPT-4o가 브랜드, 모델명, 품번을 95% 이상의 정확도로 식별합니다</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💰</div>
+                        <h3>실시간 시세</h3>
+                        <p>KREAM, StockX 등 주요 플랫폼의 가격과 차액을 비교합니다</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📈</div>
+                        <h3>가격 예측</h3>
+                        <p>Prophet 시계열 모델이 30일 후 가격 변동을 예측합니다</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h3>AI 추천</h3>
+                        <p>LLM이 모든 데이터를 종합해 BUY/SELL/HOLD 추천 리포트를 작성합니다</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔄</div>
+                        <h3>차익 거래</h3>
+                        <p>해외-국내 플랫폼 간 가격 차이를 분석해 마진 기회를 포착합니다</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- PAGE: 인기 목록 -->
+    <div class="page" id="page-trending">
+        <div class="container">
+            <h2 class="section-title">🔥 실시간 인기 스니커즈</h2>
+            <p class="section-subtitle">현재 가장 거래량이 많은 인기 스니커즈 리셀 목록</p>
+            
+            <!-- 검색 바 -->
+            <div class="trending-search">
+                <input type="text" id="trending-search-input" placeholder="모델명 또는 품번으로 검색 (예: Air Jordan 1, DD1391-100)">
+                <button class="btn btn-primary" id="btn-trending-search">검색</button>
+            </div>
+
+            <!-- 필터/정렬 옵션 -->
+            <div class="trending-filters">
+                <div class="filter-group">
+                    <label>브랜드</label>
+                    <select id="filter-brand">
+                        <option value="">전체</option>
+                        <option value="Jordan">Jordan</option>
+                        <option value="Nike">Nike</option>
+                        <option value="adidas">Adidas</option>
+                        <option value="New Balance">New Balance</option>
+                        <option value="Asics">Asics</option>
+                        <option value="Converse">Converse</option>
+                        <option value="Vans">Vans</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>사이즈</label>
+                    <select id="filter-size">
+                        <option value="">전체</option>
+                        <option value="5">US 5 / 230</option>
+                        <option value="5.5">US 5.5 / 235</option>
+                        <option value="6">US 6 / 240</option>
+                        <option value="6.5">US 6.5 / 245</option>
+                        <option value="7">US 7 / 250</option>
+                        <option value="7.5">US 7.5 / 255</option>
+                        <option value="8">US 8 / 260</option>
+                        <option value="8.5">US 8.5 / 265</option>
+                        <option value="9">US 9 / 270</option>
+                        <option value="9.5">US 9.5 / 275</option>
+                        <option value="10">US 10 / 280</option>
+                        <option value="10.5">US 10.5 / 285</option>
+                        <option value="11">US 11 / 290</option>
+                        <option value="11.5">US 11.5 / 295</option>
+                        <option value="12">US 12 / 300</option>
+                        <option value="13">US 13 / 310</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>성별</label>
+                    <select id="filter-gender">
+                        <option value="">전체</option>
+                        <option value="men">남성</option>
+                        <option value="women">여성</option>
+                        <option value="unisex">유니섹스</option>
+                        <option value="youth">키즈</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>정렬</label>
+                    <select id="filter-sort">
+                        <option value="rank:asc">인기순</option>
+                        <option value="min_price:asc">가격 낮은순</option>
+                        <option value="min_price:desc">가격 높은순</option>
+                        <option value="avg_price:asc">평균가 낮은순</option>
+                        <option value="avg_price:desc">평균가 높은순</option>
+                    </select>
+                </div>
+                <button class="btn btn-outline btn-filter-apply" id="btn-apply-filters">필터 적용</button>
+            </div>
+
+            <!-- 인기 목록 -->
+            <div class="trending-list" id="trending-list">
+                <div class="trending-loading">
+                    <div class="spinner"></div>
+                    <p>인기 스니커즈 목록을 불러오는 중...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: 추천 Top10 -->
+    <div class="page" id="page-recommendations">
+        <div class="container">
+            <h2 class="section-title">🔥 트렌드 구매 추천 Top 10</h2>
+            <p class="section-subtitle">유튜브, 구글 트렌드, SNS 분석 기반 리셀 투자 추천</p>
+            <button class="btn btn-primary" id="btn-load-recommendations" style="display:block; margin: 0 auto 24px;">
+                🔄 트렌드 새로고침
+            </button>
+            <div id="recommendations-list"></div>
+        </div>
+    </div>
+
+    <!-- PAGE: 분석하기 -->
+    <div class="page" id="page-analyzer">
+        <div class="container">
+            <h2 class="section-title">스니커즈 분석</h2>
+            <p class="section-subtitle">이미지 또는 품번 중 하나만 입력해도 분석됩니다</p>
+
+            <div class="analyzer-container">
+                <!-- 통합 입력 패널 -->
+                <div class="input-panel">
+                    <!-- 이미지 업로드 (다중) -->
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-placeholder">
+                            <div class="upload-icon">📸</div>
+                            <p>스니커즈 사진을 드래그하거나 클릭 (여러 장 가능)</p>
+                            <span class="upload-hint">PNG, JPG, WEBP (최대 16MB/장)</span>
+                        </div>
+                        <div id="preview-container" class="preview-container hidden"></div>
+                    </div>
+                    <input type="file" id="file-input" accept="image/*" multiple hidden>
+
+                    <!-- 품번 입력 (다중, 쉼표 구분) -->
+                    <div class="code-input-group">
+                        <label for="style-code-input">품번 (여러 개는 쉼표로 구분)</label>
+                        <input type="text" id="style-code-input" placeholder="예: M1906AD, DD1391-100, U992GY">
+                        <div class="quick-samples">
+                            <button class="sample-btn" data-code="DD1391-100">Jordan 1 Chicago</button>
+                            <button class="sample-btn" data-code="DZ5485-612">Lost and Found</button>
+                            <button class="sample-btn" data-code="U992GY">NB 992 Grey</button>
+                        </div>
+                    </div>
+
+                    <!-- 사이즈 선택 -->
+                    <div class="code-input-group">
+                        <label for="analyze-size">사이즈 (선택)</label>
+                        <select id="analyze-size">
+                            <option value="">전체 (최저가 기준)</option>
+                            <option value="5">US 5 / 230</option>
+                            <option value="5.5">US 5.5 / 235</option>
+                            <option value="6">US 6 / 240</option>
+                            <option value="6.5">US 6.5 / 245</option>
+                            <option value="7">US 7 / 250</option>
+                            <option value="7.5">US 7.5 / 255</option>
+                            <option value="8">US 8 / 260</option>
+                            <option value="8.5">US 8.5 / 265</option>
+                            <option value="9">US 9 / 270</option>
+                            <option value="9.5">US 9.5 / 275</option>
+                            <option value="10">US 10 / 280</option>
+                            <option value="10.5">US 10.5 / 285</option>
+                            <option value="11">US 11 / 290</option>
+                            <option value="11.5">US 11.5 / 295</option>
+                            <option value="12">US 12 / 300</option>
+                            <option value="13">US 13 / 310</option>
+                        </select>
+                    </div>
+
+                    <!-- 분석 버튼 -->
+                    <button class="btn btn-primary btn-full" id="btn-analyze">
+                        🔍 AI 분석 시작
+                    </button>
+                </div>
+
+                <!-- 결과 패널 (페이지네이션) -->
+                <div class="result-panel" id="result-panel">
+                    <div class="result-placeholder">
+                        <div class="placeholder-icon">🎯</div>
+                        <p>분석 결과가 여기에 표시됩니다</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: 작동원리 -->
+    <div class="page" id="page-how-it-works">
+        <div class="container">
+            <h2 class="section-title">작동 원리</h2>
+            <p class="section-subtitle">5단계 AI 파이프라인이 리셀 투자 의사결정을 지원합니다</p>
+            <div class="pipeline">
+                <div class="pipeline-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>이미지 업로드</h4>
+                        <p>사용자가 스니커즈 사진을 업로드합니다</p>
+                    </div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>비전 모델</h4>
+                        <p>GPT-4o/Claude가 브랜드·모델·품번 식별</p>
+                    </div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>시세 조회</h4>
+                        <p>KREAM·StockX 가격 및 거래량 수집</p>
+                    </div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>가격 예측</h4>
+                        <p>Prophet 시계열 모델로 30일 예측</p>
+                    </div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>AI 추천</h4>
+                        <p>LLM이 종합 분석 리포트 작성</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">👟</span>
+                    <span class="logo-text">SneakerAI</span>
+                    <p>AI 기반 스니커즈 리셀 투자 분석 플랫폼 (MVP Demo)</p>
+                </div>
+                <div class="footer-tech">
+                    <h4>기술 스택</h4>
+                    <p>Frontend: HTML/CSS/JavaScript + Chart.js</p>
+                    <p>Backend: Python Flask + SQLite</p>
+                    <p>AI: OpenAI GPT-4o / Claude + Prophet</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 SneakerAI - Demo Version. 투자 참고용이며 실제 투자 손실에 대한 책임은 없습니다.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 로딩 오버레이 -->
+    <div class="loading-overlay hidden" id="loading-overlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p class="loading-text" id="loading-text">AI가 스니커즈를 분석하고 있습니다...</p>
+            <div class="loading-steps" id="loading-steps">
+                <div class="loading-step" data-step="1">📸 이미지 인식 중...</div>
+                <div class="loading-step" data-step="2">💰 시세 조회 중...</div>
+                <div class="loading-step" data-step="3">📈 가격 예측 중...</div>
+                <div class="loading-step" data-step="4">🤖 추천 리포트 작성 중...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

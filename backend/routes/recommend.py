@@ -81,34 +81,10 @@ def analyze_by_code():
     style_code = data['style_code'].strip()
     size = data.get('size', '').strip()  # 사이즈 (선택)
 
-    # 가격 데이터 조회 (KicksDB 1순위 → 로컬 DB)
+    # 가격 데이터 조회 (KicksDB → 로컬 DB)
     price_data = search_sneaker_api(style_code)
     if "error" in price_data:
-        # 외부 API/로컬 DB 모두 실패 → OpenAI에게 물어보기
-        from services.vision_service import lookup_sneaker_by_code
-        ai_info = lookup_sneaker_by_code(style_code)
-        if ai_info and "error" not in ai_info:
-            # AI가 알려준 정보로 기본 데이터 구성
-            sneaker_info = ai_info
-            price_data = {
-                "source": "ai_lookup",
-                "sneaker": sneaker_info,
-                "current_price": {
-                    "kream": 0,
-                    "stockx_usd": 0,
-                    "stockx_krw": 0,
-                    "price_gap_krw": 0,
-                    "exchange_rate": 1350,
-                },
-                "statistics": {
-                    "avg_price_30d": 0,
-                    "total_sales_30d": 0,
-                    "price_trend": "데이터 없음",
-                },
-                "price_history": {"kream": [], "stockx": []},
-            }
-        else:
-            return jsonify({"error": f"품번 '{style_code}'에 대한 데이터를 찾을 수 없습니다."}), 404
+        return jsonify({"error": f"품번 '{style_code}'에 대한 데이터를 찾을 수 없습니다."}), 404
 
     # 시계열 예측
     forecast_data = forecast_price_prophet(style_code, periods=30)
@@ -119,8 +95,12 @@ def analyze_by_code():
         sneaker_info['selected_size'] = size
         price_data['selected_size'] = size
 
-    # LLM 추천 생성
-    recommendation = generate_recommendation(sneaker_info, price_data, forecast_data)
+    # AI 추천은 명시적 요청 시에만 (use_ai=true 파라미터)
+    use_ai = data.get('use_ai', False)
+    if use_ai:
+        recommendation = generate_recommendation(sneaker_info, price_data, forecast_data)
+    else:
+        recommendation = {"recommendation": "N/A", "summary": "AI 분석 미사용", "key_factors": [], "detailed_report": ""}
 
     return jsonify({
         "success": True,

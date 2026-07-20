@@ -19,6 +19,7 @@ function navigateTo(pageName) {
     if (pageName === 'home') loadWordCloud();
     if (pageName === 'trending') loadTrendingSneakers();
     if (pageName === 'recommendations') loadRecommendations();
+    if (pageName === 'analyzer') renderSearchHistory();
 }
 
 // 네비게이션 클릭 이벤트
@@ -225,9 +226,17 @@ btnAnalyze.addEventListener('click', async () => {
         return;
     }
 
+    // 이전 결과 리셋
+    resetAnalyzer();
+
     showLoading();
     analysisResults = [];
     currentResultPage = 0;
+
+    // 히스토리에 추가
+    for (const code of codes) {
+        addToHistory({ sku: code, title: code });
+    }
 
     // 이미지 분석
     for (const file of selectedFiles) {
@@ -272,6 +281,8 @@ async function analyzeImageSingle(file) {
 async function analyzeCodeSingle(code, size) {
     const body = { style_code: code };
     if (size) body.size = size;
+    // AI 분석 사용하지 않음 (데이터만 반환)
+    body.use_ai = false;
     try {
         const response = await fetch(`${API_BASE}/recommend/analyze-by-code`, {
             method: 'POST',

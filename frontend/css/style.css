@@ -41,9 +41,11 @@ body {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 20px;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 /* ========== 네비게이션 ========== */
@@ -873,10 +875,9 @@ body {
 
 .trending-list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px;
     width: 100%;
-    box-sizing: border-box;
 }
 
 .trending-loading {
@@ -1553,9 +1554,6 @@ body {
     overflow-x: hidden;
 }
 
-#page-trending .container,
-#page-recommendations .container {
-    max-width: 1100px;
-    padding: 0 16px;
-    box-sizing: border-box;
+body {
+    overflow-x: hidden;
 }

@@ -42,21 +42,8 @@ def search_sneaker_api(style_code: str, force_rapidapi: bool = False) -> dict:
     if result is None:
         return {"error": f"'{style_code}'에 대한 데이터를 찾을 수 없습니다."}
 
-    # KREAM 실시간 가격 추가 (비동기적으로 시도, 실패해도 StockX 데이터 유지)
-    try:
-        from services.kream_service import get_kream_price_for_analysis
-        kream_data = get_kream_price_for_analysis(style_code)
-        if "error" not in kream_data and kream_data.get('kream_price', 0) > 0:
-            result['current_price']['kream'] = kream_data['kream_price']
-            result['current_price']['kream_buy'] = kream_data.get('buy_price', 0)
-            result['current_price']['kream_sell'] = kream_data.get('sell_price', 0)
-            # 차액 계산
-            stockx_krw = result['current_price'].get('stockx_krw', 0)
-            if stockx_krw > 0:
-                result['current_price']['price_gap_krw'] = kream_data['kream_price'] - stockx_krw
-            result['kream_url'] = kream_data.get('url', '')
-    except Exception as e:
-        print(f"⚠️ KREAM 가격 조회 실패 (StockX 데이터 사용): {e}")
+    # KREAM 실시간 가격은 현재 비활성 (배포 환경에서 크롤링 불가)
+    # StockX(KicksDB) 가격만 제공
 
     return result
 

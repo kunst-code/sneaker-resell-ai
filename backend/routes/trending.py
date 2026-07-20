@@ -18,7 +18,7 @@ trending_bp = Blueprint('trending', __name__)
 def popular():
     """
     실시간 인기 스니커즈 목록
-    파라미터: limit, brand, gender, sort(rank/min_price/avg_price), order(asc/desc)
+    1시간 DB 캐시 → 즉시 로드, 만료 시 백그라운드 갱신
     """
     limit = request.args.get('limit', 20, type=int)
     brand = request.args.get('brand', '').strip() or None
@@ -27,22 +27,79 @@ def popular():
     sort = request.args.get('sort', 'rank').strip()
     order = request.args.get('order', 'asc').strip()
 
-    # 정렬 옵션 매핑
     valid_sorts = ['rank', 'min_price', 'avg_price', 'max_price']
     if sort not in valid_sorts:
         sort = 'rank'
-    if sort != 'rank' and order == 'asc':
-        order = 'asc'  # 가격 오름차순 기본
 
-    # 1순위: KicksDB v3 실시간 데이터
+    # 캐시 키 생성
+    import hashlib
+    cache_key = hashlib.md5(f"{brand}:{gender}:{size}:{sort}:{order}:{limit}".encode()).hexdigest()
+
+    # DB 캐시 확인 (1시간)
+    cached = _get_popular_cache(cache_key)
+    if cached:
+        return jsonify(cached)
+
+    # KicksDB에서 실시간 조회
     from services.kicksdb_service import get_trending_sneakers
     kicksdb_result = get_trending_sneakers(limit=limit, brand=brand, gender=gender, sort=sort, order=order, size=size)
+
     if kicksdb_result.get('success') and kicksdb_result.get('trending'):
+        _save_popular_cache(cache_key, kicksdb_result)
         return jsonify(kicksdb_result)
 
-    # 2순위: 로컬 DB 캐시
+    # 폴백: 로컬 DB
     result = get_trending_from_db(limit=limit)
     return jsonify(result)
+
+
+def _get_popular_cache(cache_key: str):
+    """1시간 이내 캐시 반환"""
+    from datetime import datetime, timedelta
+    import json as json_lib
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS popular_cache (
+                cache_key TEXT PRIMARY KEY,
+                data TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.commit()
+        cutoff = (datetime.now() - timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
+        cursor.execute('SELECT data FROM popular_cache WHERE cache_key = ? AND created_at > ?', (cache_key, cutoff))
+        row = cursor.fetchone()
+        conn.close()
+        if row:
+            result = json_lib.loads(row['data'])
+            result['from_cache'] = True
+            return result
+    except Exception:
+        pass
+    return None
+
+
+def _save_popular_cache(cache_key: str, data: dict):
+    """캐시 저장"""
+    import json as json_lib
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS popular_cache (
+                cache_key TEXT PRIMARY KEY,
+                data TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        cursor.execute('INSERT OR REPLACE INTO popular_cache (cache_key, data) VALUES (?, ?)',
+                       (cache_key, json_lib.dumps(data, ensure_ascii=False)))
+        conn.commit()
+        conn.close()
+    except Exception:
+        pass
 
 
 @trending_bp.route('/search', methods=['GET'])

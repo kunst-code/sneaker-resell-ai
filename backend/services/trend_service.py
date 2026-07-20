@@ -129,39 +129,49 @@ def _save_recommendations_cache(result: dict):
 
 
 def _get_ai_trend_picks(api_key: str) -> dict:
-    """GPT-4o에게 현재 스니커즈 트렌드 분석 + 추천 Top 10 요청"""
-    prompt = """당신은 스니커즈 리셀 투자 전문가입니다. 2026년 7월 현재 유튜브, 구글 트렌드, SNS에서 관찰되는 스니커즈 시장 트렌드를 분석하고, 지금 구매하면 리셀 수익이 기대되는 스니커즈 Top 10을 추천해주세요.
+    """GPT-4o에게 한국 KREAM 시장 기준 트렌드 분석 + 추천 Top 10 요청"""
+    prompt = """당신은 한국 스니커즈 리셀 시장(KREAM, 솔드아웃) 전문가입니다.
+2026년 7월 현재 한국에서 인기 있는 스니커즈 트렌드를 분석하고, KREAM에서 구매/리셀 수익이 기대되는 스니커즈 Top 10을 추천해주세요.
 
-현재 시장 트렌드:
-- Jordan 4 Toro Bravo (2026), Nigel Sylvester 콜라보가 매우 핫함
-- Travis Scott x Jordan 콜라보 지속적 인기
-- New Balance 992/990 시리즈 국내에서 인기 급상승
-- Adidas Yeezy 라인 가격 안정화, 일부 모델 반등
-- Nike SB Dunk 콜라보 모델 꾸준한 프리미엄
-- Asics 콜라보 (JJJJound, Kith) 신규 수요층 유입
-- Off-White x Air Jordan 1 Archive 시리즈 (Alaska) 화제
-- Nike Air Force 1 언더 리테일 기회 존재
+중요: 반드시 한국 KREAM에서 실제 거래되는 모델만 추천해주세요.
+해외 전용 모델(미국/유럽 한정)은 제외합니다.
+
+한국 KREAM 시장 현황:
+- New Balance 992, 990v6, 2002R, 1906 시리즈: 국내 최고 인기, 가격 꾸준히 상승
+- Nike Dunk Low: 파스텔/클래식 컬러웨이 여전히 인기
+- Asics Gel-Kayano 14, Gel-1130: MZ세대 선호, 가격 상승
+- Jordan 1 Low: Travis Scott 콜라보 + 클래식 컬러 인기
+- Adidas Samba, Gazelle: 레트로 무드 지속
+- Nike Air Force 1: 발매가 이하 거래 (저점 매수 기회)
+- Salomon XT-6: 고프코어 트렌드 지속
+- 뉴발란스 x JJJJound, WTAPS 콜라보: 프리미엄 유지
+- Jordan 4 Bred Reimagined, Military Blue: 국내 인기 높음
+- Converse Chuck 70: 기본템 수요 꾸준
 
 반드시 아래 JSON 형식으로 응답해주세요:
 {
-    "analysis": "현재 시장 트렌드 요약 (3~4문장, 한국어)",
+    "analysis": "현재 한국 KREAM 시장 트렌드 요약 (3~4문장, 한국어)",
     "generated_at": "2026-07-18",
     "picks": [
         {
             "rank": 1,
-            "model_name": "정식 모델명",
+            "model_name": "정식 모델명 (한국에서 통용되는 이름)",
             "brand": "브랜드",
-            "style_code": "품번 (알면)",
+            "style_code": "품번 (KREAM에서 검색 가능한 모델번호)",
             "colorway": "컬러웨이",
-            "reason": "추천 이유 (1~2문장, 한국어)",
-            "trend_source": "유튜브/구글트렌드/SNS 중 어디서 화제",
+            "reason": "추천 이유 (1~2문장, 한국어, KREAM 시장 관점)",
+            "trend_source": "KREAM/인스타그램/유튜브/커뮤니티 중 출처",
             "buy_signal": "BUY 또는 HOLD",
             "price_trend": "상승/하락/보합"
         }
     ]
 }
 
-10개를 추천해주세요. 실제 존재하는 모델과 품번을 사용해주세요. JSON만 출력하세요."""
+10개를 추천해주세요.
+- 반드시 KREAM에서 검색 가능한 실제 품번(모델번호)을 사용하세요
+- 예: M992GR, U990GL6, M2002RXA, 1201A019, DD1391-100
+- 한국 소비자가 실제로 구매하는 모델 위주
+JSON만 출력하세요."""
 
     try:
         response = httpx.post(

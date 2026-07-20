@@ -281,10 +281,16 @@ def get_target_skus() -> list:
     except Exception:
         pass
 
-    # 3. 기본 인기 품번
+    # 3. 기본 인기 품번 (한국 KREAM 인기 모델)
     default_skus = [
-        'DD1391-100', 'DZ5485-612', 'FQ8138-600', 'DM7866-162',
-        'HQ6448', 'CW2288-111', 'U992GY', 'M1906AD',
+        'M992GR', 'U990GL6', 'M2002RXA', 'M1906AD',  # New Balance
+        'DD1391-100', 'DZ5485-612', 'FQ1759-002',      # Jordan
+        'DD1503-100', 'DD1503-101',                     # Nike Dunk Low
+        'CW2288-111',                                    # Air Force 1
+        '1201A019-108', '1202A164-020',                  # Asics
+        'IG7379', 'GY7403',                              # Adidas Samba/Gazelle
+        'L47288800',                                     # Salomon XT-6
+        'U992GY',                                        # NB 992 Grey
     ]
     skus.update(default_skus)
 

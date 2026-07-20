@@ -332,6 +332,9 @@ function renderPaginatedResults() {
 
     // 결과 HTML 생성
     resultPanel.innerHTML = paginationHtml + buildResultHTML(pipeline) + paginationHtml;
+
+    // 결과 패널 스크롤 최상단
+    resultPanel.scrollTop = 0;
 }
 
 function prevResult() {
@@ -958,8 +961,9 @@ function reSearchHistory(query) {
         styleCodeInput.value = query;
         btnAnalyze.click();
     }
-    // 결과 영역 최상단으로 스크롤
+    // 결과 패널 스크롤 최상단으로
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => resultPanel.scrollTop = 0, 100);
 }
 
 function analyzeTrendingSneaker(skuOrName, itemData) {

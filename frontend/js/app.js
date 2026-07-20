@@ -236,11 +236,6 @@ btnAnalyze.addEventListener('click', async () => {
     analysisResults = [];
     currentResultPage = 0;
 
-    // 히스토리에 추가
-    for (const code of codes) {
-        addToHistory({ sku: code, title: code });
-    }
-
     // 이미지 분석
     for (const file of selectedFiles) {
         updateLoadingStep(1);
@@ -259,6 +254,10 @@ btnAnalyze.addEventListener('click', async () => {
 
     if (analysisResults.length > 0) {
         renderPaginatedResults();
+        // 결과를 히스토리에 저장
+        for (let i = 0; i < codes.length && i < analysisResults.length; i++) {
+            addToHistory({ sku: codes[i], title: codes[i] }, analysisResults[i]);
+        }
         // 결과 나온 후 검색창 리셋
         styleCodeInput.value = '';
         selectedFiles = [];
@@ -881,13 +880,14 @@ function renderTrendingList(items) {
 // ========== 검색 히스토리 ==========
 let searchHistory = JSON.parse(localStorage.getItem('sneaker_search_history') || '[]');
 
-function addToHistory(item) {
+function addToHistory(item, resultData) {
     const entry = {
         sku: item.sku || item.style_code || '',
         title: item.title || item.model_name || '',
         price: item.min_price || item.price_usd || 0,
         image: item.image || '',
         timestamp: Date.now(),
+        result: resultData || null,  // 분석 결과 저장
     };
     if (!entry.sku && !entry.title) return;
 
@@ -932,9 +932,17 @@ function resetAnalyzer() {
 }
 
 function reSearchHistory(query) {
-    // 최근 검색 클릭 시 자동 분석 실행
-    styleCodeInput.value = query;
-    btnAnalyze.click();
+    // 최근 검색 클릭 시 — 저장된 결과 바로 표시 (서버 재호출 없음)
+    const cached = searchHistory.find(h => (h.sku === query || h.title === query));
+    if (cached && cached.result) {
+        analysisResults = [cached.result];
+        currentResultPage = 0;
+        renderPaginatedResults();
+    } else {
+        // 캐시 없으면 서버 호출
+        styleCodeInput.value = query;
+        btnAnalyze.click();
+    }
 }
 
 function analyzeTrendingSneaker(skuOrName, itemData) {

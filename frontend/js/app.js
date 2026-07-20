@@ -809,6 +809,9 @@ function renderTrendingList(items) {
         return;
     }
 
+    // 전역 저장 (클릭 시 데이터 전달용)
+    window._trendingItems = items;
+
     trendingList.innerHTML = items.map((item, idx) => {
         const title = item.title || item.model_name || '';
         const sku = item.sku || item.style_code || '';
@@ -827,7 +830,7 @@ function renderTrendingList(items) {
         const priceAvg = avgPrice ? `평균 $${Math.round(avgPrice)}` : '';
 
         return `
-            <div class="trending-card" onclick="analyzeTrendingSneaker('${sku || title}')">
+            <div class="trending-card" onclick="analyzeTrendingSneaker('${sku || title}', window._trendingItems[${idx}])">
                 <img class="trending-card-image" src="${imageUrl}" alt="${title}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjMWUyOTNiIi8+PHRleHQgeD0iNDAiIHk9IjQ1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjMwIj7wn5GLPC90ZXh0Pjwvc3ZnPg=='">
                 <div class="trending-card-info">
                     <div class="trending-card-title">${title}</div>
@@ -849,10 +852,63 @@ function renderTrendingList(items) {
     }).join('');
 }
 
-function analyzeTrendingSneaker(skuOrName) {
-    // 클릭하면 분석 페이지로 이동 후 품번 입력
-    styleCodeInput.value = skuOrName;
-    navigateTo('analyzer');
+function analyzeTrendingSneaker(skuOrName, itemData) {
+    // 데이터가 있으면 AI 없이 바로 표시
+    if (itemData) {
+        navigateTo('analyzer');
+        renderQuickResult(itemData);
+    } else {
+        styleCodeInput.value = skuOrName;
+        navigateTo('analyzer');
+    }
+}
+
+function renderQuickResult(item) {
+    const title = item.title || item.model_name || '';
+    const brand = item.brand || '';
+    const sku = item.sku || item.style_code || '';
+    const minPrice = item.min_price || item.price_usd || null;
+    const avgPrice = item.avg_price || item.avg_price_usd || null;
+    const weeklyOrders = item.weekly_orders || 0;
+    const image = item.image || '';
+    const colorway = item.colorway || '';
+    const year = item.release_year || (item.release_date ? item.release_date.slice(0, 4) : 'N/A');
+    const priceKRW = item.price_krw || (minPrice ? Math.round(minPrice * 1350) : 0);
+    const signal = item.buy_signal || '';
+    const reason = item.reason || '';
+    const trend = item.price_trend || '';
+
+    resultPanel.innerHTML = `
+        <div class="product-info-card">
+            ${image ? `<div class="product-info-image"><img src="${image}" alt="${title}" onerror="this.parentElement.style.display='none'"></div>` : ''}
+            <h3 class="product-info-title">${title}</h3>
+            <p class="product-info-subtitle">${colorway}</p>
+            <div class="product-info-table">
+                <div class="product-info-row"><span class="product-info-label">모델 번호</span><span class="product-info-value">${sku}</span></div>
+                <div class="product-info-row"><span class="product-info-label">브랜드</span><span class="product-info-value">${brand}</span></div>
+                <div class="product-info-row"><span class="product-info-label">출시일</span><span class="product-info-value">${year}</span></div>
+            </div>
+        </div>
+        <div class="result-section">
+            <h3>💰 현재 시세</h3>
+            <div class="info-grid">
+                ${minPrice ? `<div class="info-item"><div class="label">StockX 최저가</div><div class="value">$${minPrice}</div></div>` : ''}
+                ${avgPrice ? `<div class="info-item"><div class="label">StockX 평균가</div><div class="value">$${Math.round(avgPrice)}</div></div>` : ''}
+                ${priceKRW ? `<div class="info-item"><div class="label">원화 환산</div><div class="value">₩${priceKRW.toLocaleString()}</div></div>` : ''}
+                ${weeklyOrders ? `<div class="info-item"><div class="label">주간 거래량</div><div class="value">${weeklyOrders.toLocaleString()}건</div></div>` : ''}
+            </div>
+        </div>
+        ${signal || trend || reason ? `
+        <div class="result-section">
+            <h3>📊 분석 요약</h3>
+            ${signal ? `<div style="text-align:center;margin:12px 0;"><span class="recommendation-badge ${signal === 'BUY' ? 'buy' : 'hold'}">${signal === 'BUY' ? '🟢 매수 (BUY)' : '🟡 보유 (HOLD)'}</span></div>` : ''}
+            ${trend ? `<p style="color:var(--text-secondary);">추세: ${trend} ${trend === '상승' ? '📈' : trend === '하락' ? '📉' : '➡️'}</p>` : ''}
+            ${reason ? `<p class="report-text">${reason}</p>` : ''}
+        </div>` : ''}
+        <div style="text-align:center; margin-top:20px;">
+            <button class="btn btn-primary" onclick="styleCodeInput.value='${sku}'; btnAnalyze.click();">🔍 AI 상세 분석 실행</button>
+        </div>
+    `;
 }
 
 async function triggerCollection() {
@@ -939,6 +995,9 @@ async function loadRecommendations() {
 function renderRecommendations(data) {
     const { trend_analysis, recommendations, generated_at, from_cache } = data;
 
+    // 전역 저장 (클릭 시 데이터 전달용)
+    window._recItems = recommendations;
+
     let html = `
         <div class="result-section" style="margin-bottom: 20px;">
             <h3>📊 시장 트렌드 분석</h3>
@@ -961,7 +1020,7 @@ function renderRecommendations(data) {
         const imageUrl = item.image || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjMWUyOTNiIi8+PHRleHQgeD0iNDAiIHk9IjQ1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjMwIj7wn5GLPC90ZXh0Pjwvc3ZnPg==';
 
         return `
-            <div class="trending-card" onclick="analyzeTrendingSneaker('${item.style_code || item.model_name}')">
+            <div class="trending-card" onclick="analyzeTrendingSneaker('${item.style_code || item.model_name}', window._recItems[${idx}])">
                 <img class="trending-card-image" src="${imageUrl}" alt="${item.model_name}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjMWUyOTNiIi8+PHRleHQgeD0iNDAiIHk9IjQ1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjMwIj7wn5GLPC90ZXh0Pjwvc3ZnPg=='">
                 <div class="trending-card-info">
                     <div class="trending-card-title">

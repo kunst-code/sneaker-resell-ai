@@ -372,7 +372,7 @@ function buildResultHTML(pipeline) {
             ${rec.recommendation === 'N/A' ? `
                 <p style="color:var(--text-muted);text-align:center;margin:16px 0;">AI 분석을 사용하지 않았습니다</p>
                 <div style="text-align:center;">
-                    <button class="btn btn-primary" onclick="runAiAnalysis('${sneaker.style_code || ''}')">🤖 AI 투자 분석 실행</button>
+                    <button class="btn btn-primary" onclick="runAiAnalysis(this.dataset.sku)" data-sku="${(sneaker.style_code || sneaker.model_name || '').replace(/"/g, '&quot;')}">🤖 AI 투자 분석 실행</button>
                 </div>
             ` : `
                 <div style="text-align:center;margin:20px 0;"><span class="recommendation-badge ${recClass}">${recLabel}</span></div>
@@ -975,9 +975,9 @@ async function runAiAnalysis(styleCode) {
     }
     if (!styleCode) return;
 
-    const btn = event.target;
-    btn.disabled = true;
-    btn.textContent = '🔄 AI 분석 중...';
+    // 버튼 비활성화
+    const btns = document.querySelectorAll('[onclick*="runAiAnalysis"]');
+    btns.forEach(b => { b.disabled = true; b.textContent = '🔄 AI 분석 중...'; });
 
     try {
         const response = await fetch(`${API_BASE}/recommend/analyze-by-code`, {
@@ -990,11 +990,13 @@ async function runAiAnalysis(styleCode) {
             analysisResults = [data.pipeline];
             currentResultPage = 0;
             renderPaginatedResults();
+            // 히스토리 업데이트 (AI 결과 포함)
+            addToHistory({ sku: styleCode, title: styleCode }, data.pipeline);
         } else {
-            btn.textContent = '❌ 분석 실패';
+            btns.forEach(b => { b.textContent = '❌ 분석 실패'; });
         }
     } catch (e) {
-        btn.textContent = '❌ 서버 오류';
+        btns.forEach(b => { b.textContent = '❌ 서버 오류'; });
     }
 }
 

@@ -125,11 +125,13 @@ function renderWordCloud(keywords) {
         // 초기 애니메이션 후 floating 시작
         setTimeout(floatAnimation, keywords.length * 80 + 1000);
 
-        // 클릭 시 검색
+        // 클릭 시 검색 (서버에 새로 조회)
         text.on('click', function(event, d) {
             const input = document.getElementById('style-code-input');
             if (input) input.value = d.text;
             navigateTo('analyzer');
+            // 자동으로 분석 실행
+            setTimeout(() => btnAnalyze.click(), 300);
         });
     }
 }

@@ -28,7 +28,14 @@ document.addEventListener('click', (e) => {
     if (link) {
         e.preventDefault();
         navigateTo(link.dataset.page);
+        // 모바일: 메뉴 닫기
+        document.getElementById('nav-links').classList.remove('open');
     }
+});
+
+// 모바일 햄버거 메뉴 토글
+document.getElementById('nav-toggle').addEventListener('click', () => {
+    document.getElementById('nav-links').classList.toggle('open');
 });
 
 // ========== 워드클라우드 (D3.js) ==========

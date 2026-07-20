@@ -900,7 +900,7 @@ function renderQuickResult(item) {
                 ${minPrice ? `<div class="info-item"><div class="label">StockX 최저가</div><div class="value">$${minPrice}</div></div>` : ''}
                 ${avgPrice ? `<div class="info-item"><div class="label">StockX 평균가</div><div class="value">$${Math.round(avgPrice)}</div></div>` : ''}
                 ${maxPrice ? `<div class="info-item"><div class="label">StockX 최고가</div><div class="value">$${maxPrice}</div></div>` : ''}
-                ${priceKRW ? `<div class="info-item"><div class="label">원화 환산 (최저)</div><div class="value">₩${priceKRW.toLocaleString()}</div></div>` : ''}
+                ${priceKRW ? `<div class="info-item"><div class="label">원화 환산 (최저)</div><div class="value">₩${priceKRW.toLocaleString()}<br><span style="font-size:0.7rem;color:var(--text-muted)">환율 ${Math.round(window._exchangeRate || 1380)}원/USD</span></div></div>` : ''}
                 ${weeklyOrders ? `<div class="info-item"><div class="label">주간 거래량</div><div class="value">${weeklyOrders.toLocaleString()}건</div></div>` : ''}
             </div>
             ${minPrice && maxPrice ? `<p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">사이즈별 가격 범위: $${minPrice} ~ $${maxPrice}</p>` : ''}

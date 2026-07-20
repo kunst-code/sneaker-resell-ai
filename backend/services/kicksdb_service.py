@@ -55,6 +55,15 @@ def search_sneakers(query: str, limit: int = 20) -> dict:
                 if filtered:
                     products = filtered
 
+            # 모델명/숫자 매칭 필터
+            import re
+            numbers_in_query = re.findall(r'\d+', translated_query)
+            if numbers_in_query and products:
+                main_number = numbers_in_query[0]
+                exact_match = [p for p in products if main_number in (p.get('title', '') or '') or main_number in (p.get('sku', '') or '')]
+                if exact_match:
+                    products = exact_match
+
             return {"success": True, "products": products, "count": len(products)}
         else:
             return {"error": f"KicksDB API 오류: {response.status_code}", "details": response.text[:200]}
@@ -209,6 +218,15 @@ def get_price_from_kicksdb(style_code: str) -> dict:
             filtered = [p for p in products if expected_brand.lower() in (p.get('brand', '') or '').lower()]
             if filtered:
                 products = filtered
+
+        # 모델명/숫자 매칭 필터 (검색어에 숫자가 포함된 경우)
+        import re
+        numbers_in_query = re.findall(r'\d+', translated_query)
+        if numbers_in_query:
+            main_number = numbers_in_query[0]  # 예: "992", "990", "1906"
+            exact_match = [p for p in products if main_number in (p.get('title', '') or '') or main_number in (p.get('sku', '') or '')]
+            if exact_match:
+                products = exact_match
 
         # SKU가 정확히 일치하는 상품 우선 선택
         product = None

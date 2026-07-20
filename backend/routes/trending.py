@@ -178,28 +178,28 @@ def trend_recommendations():
 @trending_bp.route('/keywords', methods=['GET'])
 def trend_keywords():
     """트렌드 키워드 Top 20 (워드클라우드용)"""
-    # 기본 트렌드 키워드 (한국 KREAM 시장 기준)
+    # 기본 트렌드 키워드 (스니커즈 모델명만)
     keywords = [
-        {"text": "뉴발란스 992", "size": 100},
-        {"text": "Nike Dunk", "size": 95},
-        {"text": "Jordan 1 Low", "size": 90},
-        {"text": "Asics Gel", "size": 88},
-        {"text": "NB 990v6", "size": 85},
-        {"text": "Adidas Samba", "size": 82},
-        {"text": "Air Force 1", "size": 80},
+        {"text": "New Balance 992", "size": 100},
+        {"text": "Nike Dunk Low", "size": 95},
+        {"text": "Jordan 1 Low OG", "size": 90},
+        {"text": "Asics Gel-Kayano 14", "size": 88},
+        {"text": "New Balance 990v6", "size": 85},
+        {"text": "Adidas Samba OG", "size": 82},
+        {"text": "Air Force 1 '07", "size": 80},
         {"text": "Salomon XT-6", "size": 78},
-        {"text": "NB 2002R", "size": 75},
-        {"text": "Travis Scott", "size": 72},
-        {"text": "Jordan 4", "size": 70},
-        {"text": "NB 1906", "size": 68},
-        {"text": "Dunk Low", "size": 65},
-        {"text": "Gazelle", "size": 62},
-        {"text": "고프코어", "size": 60},
-        {"text": "컨버스 70", "size": 55},
-        {"text": "리셀", "size": 52},
-        {"text": "KREAM", "size": 50},
-        {"text": "언더리테일", "size": 48},
-        {"text": "한정판", "size": 45},
+        {"text": "New Balance 2002R", "size": 75},
+        {"text": "Jordan 4 Bred", "size": 72},
+        {"text": "New Balance 1906R", "size": 70},
+        {"text": "Adidas Gazelle", "size": 68},
+        {"text": "Converse Chuck 70", "size": 65},
+        {"text": "Nike SB Dunk", "size": 62},
+        {"text": "Asics Gel-1130", "size": 60},
+        {"text": "Jordan 1 Chicago", "size": 55},
+        {"text": "Yeezy Slide", "size": 52},
+        {"text": "New Balance 530", "size": 50},
+        {"text": "Nike Cortez", "size": 48},
+        {"text": "Puma Suede", "size": 45},
     ]
 
     # 인기 목록에서 동적 키워드 추가 시도

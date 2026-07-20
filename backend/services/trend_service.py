@@ -11,7 +11,7 @@ from db.database import get_db
 from services.kicksdb_service import search_sneakers, get_api_key
 
 KICKSDB_API_BASE = "https://api.kicks.dev/v3"
-CACHE_HOURS = 1  # 1시간 캐싱
+CACHE_HOURS = 24  # 24시간 캐싱
 
 
 def get_trend_recommendations() -> dict:

@@ -70,7 +70,7 @@ def _get_popular_cache(cache_key: str):
             )
         ''')
         conn.commit()
-        cutoff = (datetime.now() - timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
+        cutoff = (datetime.now() - timedelta(hours=24)).strftime('%Y-%m-%d %H:%M:%S')
         cursor.execute('SELECT data FROM popular_cache WHERE cache_key = ? AND created_at > ?', (cache_key, cutoff))
         row = cursor.fetchone()
         conn.close()

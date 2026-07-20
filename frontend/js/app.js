@@ -959,7 +959,7 @@ function reSearchHistory(query) {
         btnAnalyze.click();
     }
     // 결과 영역 최상단으로 스크롤
-    resultPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function analyzeTrendingSneaker(skuOrName, itemData) {

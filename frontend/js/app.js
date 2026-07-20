@@ -254,21 +254,25 @@ btnAnalyze.addEventListener('click', async () => {
 
     if (analysisResults.length > 0) {
         renderPaginatedResults();
+
         // 결과를 히스토리에 저장
-        // 품번 분석 결과
-        for (let i = 0; i < codes.length && i < analysisResults.length; i++) {
-            addToHistory({ sku: codes[i], title: codes[i] }, analysisResults[i]);
-        }
+        let idx = 0;
         // 이미지 분석 결과
-        for (let i = 0; i < selectedFiles.length && i < analysisResults.length; i++) {
-            const r = analysisResults[i];
+        const imageCount = selectedFiles.length;
+        for (let i = 0; i < imageCount && idx < analysisResults.length; i++, idx++) {
+            const r = analysisResults[idx];
             const sneaker = r.step1_identification || {};
             addToHistory({
-                sku: sneaker.style_code || sneaker.model_name || selectedFiles[i].name,
-                title: sneaker.model_name || selectedFiles[i].name,
+                sku: sneaker.style_code || sneaker.model_name || '',
+                title: sneaker.model_name || '이미지 분석',
                 image: sneaker.image || '',
             }, r);
         }
+        // 품번 분석 결과
+        for (let i = 0; i < codes.length && idx < analysisResults.length; i++, idx++) {
+            addToHistory({ sku: codes[i], title: codes[i] }, analysisResults[idx]);
+        }
+
         // 결과 나온 후 검색창 리셋
         styleCodeInput.value = '';
         selectedFiles = [];

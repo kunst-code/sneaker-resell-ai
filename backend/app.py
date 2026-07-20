@@ -56,6 +56,8 @@ def health():
 if __name__ == '__main__':
     from db.database import init_db
     init_db()
+    from seed_recommendations import seed_recommendations_if_empty
+    seed_recommendations_if_empty()
 
     # 서버 시작 시 데이터 수집 (24시간 지났으면 자동 수집)
     from services.collector_service import collect_trending_data, should_collect
@@ -79,3 +81,5 @@ else:
     # gunicorn 등 WSGI 서버로 실행 시
     from db.database import init_db
     init_db()
+    from seed_recommendations import seed_recommendations_if_empty
+    seed_recommendations_if_empty()

@@ -35,21 +35,65 @@ def search_sneakers(query: str, limit: int = 20) -> dict:
     if not api_key:
         return {"error": "KICKSDB_API_KEY가 설정되지 않았습니다."}
 
+    # 한글 키워드 → 영문 변환 (KicksDB는 영문만 지원)
+    translated_query, expected_brand = _translate_query(query)
+
     try:
         response = httpx.get(
             f"{KICKSDB_API_BASE}/stockx/products",
             headers=_headers(),
-            params={'query': query, 'limit': limit},
+            params={'query': translated_query, 'limit': limit},
             timeout=15.0
         )
 
         if response.status_code == 200:
             products = _extract_data(response.json())
+
+            # 브랜드 필터링 (엉뚱한 결과 방지)
+            if expected_brand and products:
+                filtered = [p for p in products if expected_brand.lower() in (p.get('brand', '') or '').lower() or expected_brand.lower() in (p.get('title', '') or '').lower()]
+                if filtered:
+                    products = filtered
+
             return {"success": True, "products": products, "count": len(products)}
         else:
             return {"error": f"KicksDB API 오류: {response.status_code}", "details": response.text[:200]}
     except Exception as e:
         return {"error": f"KicksDB 요청 실패: {str(e)}"}
+
+
+def _translate_query(query: str) -> tuple:
+    """한글 검색어를 영문으로 변환, 예상 브랜드 반환"""
+    translations = {
+        '뉴발란스': ('New Balance', 'New Balance'),
+        '나이키': ('Nike', 'Nike'),
+        '조던': ('Jordan', 'Jordan'),
+        '아디다스': ('adidas', 'adidas'),
+        '아식스': ('Asics', 'Asics'),
+        '컨버스': ('Converse', 'Converse'),
+        '살로몬': ('Salomon', 'Salomon'),
+        '반스': ('Vans', 'Vans'),
+        '푸마': ('Puma', 'Puma'),
+        '에어포스': ('Air Force', 'Nike'),
+        '덩크': ('Dunk', 'Nike'),
+        '겔카야노': ('Gel Kayano', 'Asics'),
+        '삼바': ('Samba', 'adidas'),
+        '가젤': ('Gazelle', 'adidas'),
+        '척70': ('Chuck 70', 'Converse'),
+        '이지': ('Yeezy', 'adidas'),
+        '트래비스': ('Travis Scott', 'Jordan'),
+    }
+
+    result_query = query
+    expected_brand = None
+
+    for kr, (en, brand) in translations.items():
+        if kr in query:
+            result_query = query.replace(kr, en)
+            expected_brand = brand
+            break
+
+    return result_query.strip(), expected_brand
 
 
 def get_trending_sneakers(limit: int = 20, brand: str = None, gender: str = None, sort: str = 'rank', order: str = 'asc', size: str = None) -> dict:

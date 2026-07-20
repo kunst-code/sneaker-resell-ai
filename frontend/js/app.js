@@ -365,8 +365,15 @@ function buildResultHTML(pipeline) {
         </div>
         <div class="result-section">
             <h3>🎯 AI 투자 추천</h3>
-            <div style="text-align:center;margin:20px 0;"><span class="recommendation-badge ${recClass}">${recLabel}</span></div>
-            <p class="report-text">${rec.detailed_report || rec.summary || ''}</p>
+            ${rec.recommendation === 'N/A' ? `
+                <p style="color:var(--text-muted);text-align:center;margin:16px 0;">AI 분석을 사용하지 않았습니다</p>
+                <div style="text-align:center;">
+                    <button class="btn btn-primary" onclick="runAiAnalysis('${sneaker.style_code || ''}')">🤖 AI 투자 분석 실행</button>
+                </div>
+            ` : `
+                <div style="text-align:center;margin:20px 0;"><span class="recommendation-badge ${recClass}">${recLabel}</span></div>
+                <p class="report-text">${rec.detailed_report || rec.summary || ''}</p>
+            `}
         </div>
         <div class="result-section">
             <h3>💰 현재 시세</h3>
@@ -942,6 +949,35 @@ function analyzeTrendingSneaker(skuOrName, itemData) {
 
 // 페이지 로드 시 히스토리 렌더링
 renderSearchHistory();
+
+async function runAiAnalysis(styleCode) {
+    if (!styleCode) {
+        styleCode = styleCodeInput.value.trim();
+    }
+    if (!styleCode) return;
+
+    const btn = event.target;
+    btn.disabled = true;
+    btn.textContent = '🔄 AI 분석 중...';
+
+    try {
+        const response = await fetch(`${API_BASE}/recommend/analyze-by-code`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ style_code: styleCode, use_ai: true }),
+        });
+        const data = await response.json();
+        if (data.success) {
+            analysisResults = [data.pipeline];
+            currentResultPage = 0;
+            renderPaginatedResults();
+        } else {
+            btn.textContent = '❌ 분석 실패';
+        }
+    } catch (e) {
+        btn.textContent = '❌ 서버 오류';
+    }
+}
 
 function renderQuickResult(item) {
     const title = item.title || item.model_name || '';

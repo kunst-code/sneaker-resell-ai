@@ -1255,12 +1255,16 @@ body {
 .page {
     display: none;
     min-height: calc(100vh - 80px);
-    padding-top: 40px;
+    padding-top: 100px;
     padding-bottom: 60px;
 }
 
 .page.active {
     display: block;
+}
+
+#page-home {
+    padding-top: 0;
 }
 
 .nav-link {

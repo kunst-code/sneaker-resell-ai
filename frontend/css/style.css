@@ -1499,11 +1499,29 @@ body {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, transform 0.2s;
+    min-height: 180px;
+    justify-content: flex-start;
+    cursor: pointer;
 }
 
 .pipeline-step:hover {
     border-color: var(--primary);
+    transform: translateY(-3px);
+}
+
+.pipeline-step .step-detail {
+    display: none;
+    margin-top: 12px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+}
+
+.pipeline-step.expanded .step-detail {
+    display: block;
 }
 
 .step-number {

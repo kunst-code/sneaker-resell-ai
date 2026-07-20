@@ -291,44 +291,49 @@
             <h2 class="section-title">작동 원리</h2>
             <p class="section-subtitle">5단계 AI 파이프라인이 리셀 투자 의사결정을 지원합니다</p>
             <div class="pipeline">
-                <div class="pipeline-step">
+                <div class="pipeline-step" onclick="this.classList.toggle('expanded')">
                     <div class="step-number">1</div>
                     <div class="step-content">
                         <h4>이미지 업로드</h4>
-                        <p>사용자가 스니커즈 사진을 업로드합니다</p>
+                        <p>스니커즈 사진을 업로드합니다</p>
                     </div>
+                    <div class="step-detail">사진 한 장만 찍으면 끝! 신발을 들고 카메라를 대면 AI가 알아서 브랜드와 모델을 식별합니다. 어떤 각도든 OK.</div>
                 </div>
                 <div class="pipeline-arrow">→</div>
-                <div class="pipeline-step">
+                <div class="pipeline-step" onclick="this.classList.toggle('expanded')">
                     <div class="step-number">2</div>
                     <div class="step-content">
                         <h4>비전 모델</h4>
-                        <p>GPT-4o/Claude가 브랜드·모델·품번 식별</p>
+                        <p>GPT-4o가 브랜드·모델·품번 식별</p>
                     </div>
+                    <div class="step-detail">GPT-4o Vision이 수만 개의 스니커즈 데이터를 학습해 95% 이상의 정확도로 모델명과 품번을 알려줍니다.</div>
                 </div>
                 <div class="pipeline-arrow">→</div>
-                <div class="pipeline-step">
+                <div class="pipeline-step" onclick="this.classList.toggle('expanded')">
                     <div class="step-number">3</div>
                     <div class="step-content">
                         <h4>시세 조회</h4>
-                        <p>KREAM·StockX 가격 및 거래량 수집</p>
+                        <p>StockX·KREAM 가격 비교</p>
                     </div>
+                    <div class="step-detail">해외(StockX)와 국내(KREAM) 플랫폼의 실시간 가격을 동시에 비교합니다. 차익 거래 기회를 한눈에!</div>
                 </div>
                 <div class="pipeline-arrow">→</div>
-                <div class="pipeline-step">
+                <div class="pipeline-step" onclick="this.classList.toggle('expanded')">
                     <div class="step-number">4</div>
                     <div class="step-content">
                         <h4>가격 예측</h4>
-                        <p>Prophet 시계열 모델로 30일 예측</p>
+                        <p>시계열 모델로 30일 예측</p>
                     </div>
+                    <div class="step-detail">과거 거래 데이터를 분석해 30일 뒤 가격 변동을 예측합니다. 지금 사야 할지, 기다려야 할지 판단에 도움을 줍니다.</div>
                 </div>
                 <div class="pipeline-arrow">→</div>
-                <div class="pipeline-step">
+                <div class="pipeline-step" onclick="this.classList.toggle('expanded')">
                     <div class="step-number">5</div>
                     <div class="step-content">
                         <h4>AI 추천</h4>
                         <p>LLM이 종합 분석 리포트 작성</p>
                     </div>
+                    <div class="step-detail">모든 데이터를 종합해 BUY/SELL/HOLD 투자 추천과 근거를 제시합니다. 마치 전문 리셀러 친구에게 조언을 받는 것처럼!</div>
                 </div>
             </div>
         </div>

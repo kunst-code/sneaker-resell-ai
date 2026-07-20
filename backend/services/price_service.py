@@ -42,8 +42,21 @@ def search_sneaker_api(style_code: str, force_rapidapi: bool = False) -> dict:
     if result is None:
         return {"error": f"'{style_code}'에 대한 데이터를 찾을 수 없습니다."}
 
-    # KREAM 실시간 가격은 현재 비활성 (배포 환경에서 크롤링 불가)
-    # StockX(KicksDB) 가격만 제공
+    # KREAM 가격: DB 캐시에서 조회 (배치 크롤링으로 저장된 데이터)
+    try:
+        from services.kream_batch import get_kream_price_from_db
+        kream_cached = get_kream_price_from_db(style_code)
+        if kream_cached and kream_cached.get('kream_price', 0) > 0:
+            result['current_price']['kream'] = kream_cached['kream_price']
+            result['current_price']['kream_release'] = kream_cached.get('release_price', 0)
+            result['current_price']['kream_volume'] = kream_cached.get('trade_volume', 0)
+            stockx_krw = result['current_price'].get('stockx_krw', 0)
+            if stockx_krw > 0:
+                result['current_price']['price_gap_krw'] = kream_cached['kream_price'] - stockx_krw
+            result['kream_url'] = kream_cached.get('kream_url', '')
+            result['kream_collected_date'] = kream_cached.get('collected_date', '')
+    except Exception:
+        pass
 
     return result
 

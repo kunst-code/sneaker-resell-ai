@@ -958,6 +958,8 @@ function reSearchHistory(query) {
         styleCodeInput.value = query;
         btnAnalyze.click();
     }
+    // 결과 영역 최상단으로 스크롤
+    resultPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function analyzeTrendingSneaker(skuOrName, itemData) {

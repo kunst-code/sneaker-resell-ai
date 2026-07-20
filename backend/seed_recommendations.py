@@ -52,3 +52,51 @@ def seed_recommendations_if_empty():
         conn.close()
     except Exception as e:
         print(f"⚠️ 추천 시딩 실패: {e}")
+
+
+DEFAULT_POPULAR = {
+    "success": True,
+    "exchange_rate": 1380,
+    "trending": [
+        {"title": "Nike Dunk Low Retro White Black Panda", "brand": "Nike", "sku": "DD1391-100", "image": "https://images.stockx.com/images/Nike-Dunk-Low-Retro-White-Black-2021-Product.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1738193358", "min_price": 56, "avg_price": 75, "max_price": 114, "weekly_orders": 2429, "rank": 1, "gender": "men", "colorway": "White Black Panda", "release_date": "January of 2021", "retail_price": 100, "release_year": "2021"},
+        {"title": "Jordan 4 Retro Toro Bravo (2026)", "brand": "Jordan", "sku": "FQ8138-600", "image": "https://images.stockx.com/images/Air-Jordan-4-Retro-Toro-Bravo-2026-Product.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1784232937", "min_price": 166, "avg_price": 210, "max_price": 350, "weekly_orders": 21291, "rank": 2, "gender": "men", "colorway": "Toro Bravo", "release_date": "2026", "retail_price": 215, "release_year": "2026"},
+        {"title": "New Balance 992 MiUSA Grey Silver Metallic", "brand": "New Balance", "sku": "U992GY", "image": "https://images.stockx.com/images/New-Balance-992-Grey-Product.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1738193358", "min_price": 130, "avg_price": 156, "max_price": 250, "weekly_orders": 15, "rank": 3, "gender": "men", "colorway": "Grey Silver Metallic", "release_date": "2022", "retail_price": 175, "release_year": "2022"},
+        {"title": "Jordan 1 Retro Low OG SP Travis Scott Reverse Mocha", "brand": "Jordan", "sku": "DM7866-162", "image": "https://images.stockx.com/images/Air-Jordan-1-Retro-Low-OG-SP-Travis-Scott-Reverse-Mocha_V2-Product.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1738193358", "min_price": 975, "avg_price": 1100, "max_price": 1800, "weekly_orders": 292, "rank": 4, "gender": "men", "colorway": "Reverse Mocha", "release_date": "2022", "retail_price": 150, "release_year": "2022"},
+        {"title": "ASICS Gel-Kayano 14 White Graphite Grey", "brand": "Asics", "sku": "1201A019-108", "image": "https://images.stockx.com/images/ASICS-Gel-Kayano-14-White-Graphite-Grey-Product.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1784265085", "min_price": 95, "avg_price": 120, "max_price": 180, "weekly_orders": 0, "rank": 5, "gender": "men", "colorway": "White Graphite Grey", "release_date": "2023", "retail_price": 140, "release_year": "2023"},
+        {"title": "New Balance 990v6 MiUSA Grey", "brand": "New Balance", "sku": "M990GL6", "image": "https://images.stockx.com/images/New-Balance-990v6-Grey-Product.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1738193358", "min_price": 140, "avg_price": 175, "max_price": 260, "weekly_orders": 0, "rank": 6, "gender": "men", "colorway": "Grey", "release_date": "2023", "retail_price": 200, "release_year": "2023"},
+        {"title": "Nike Air Force 1 Low '07 White", "brand": "Nike", "sku": "CW2288-111", "image": "https://images.stockx.com/images/Nike-Air-Force-1-Low-White-07-Product.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1738193358", "min_price": 55, "avg_price": 70, "max_price": 100, "weekly_orders": 8826, "rank": 7, "gender": "men", "colorway": "White", "release_date": "2020", "retail_price": 110, "release_year": "2020"},
+        {"title": "Adidas Samba OG Cloud White", "brand": "Adidas", "sku": "BZ0057", "image": "https://images.stockx.com/images/adidas-Samba-OG-Cloud-White-Core-Black-Product.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1738193358", "min_price": 80, "avg_price": 100, "max_price": 140, "weekly_orders": 0, "rank": 8, "gender": "men", "colorway": "Cloud White", "release_date": "2023", "retail_price": 100, "release_year": "2023"},
+        {"title": "Salomon XT-6 Black", "brand": "Salomon", "sku": "L41086600", "image": "https://images.stockx.com/images/Salomon-XT-6-Earth-Brown-Walnut-Product.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1770788278", "min_price": 120, "avg_price": 150, "max_price": 200, "weekly_orders": 0, "rank": 9, "gender": "unisex", "colorway": "Black", "release_date": "2023", "retail_price": 175, "release_year": "2023"},
+        {"title": "New Balance 1906R Moonbeam Raincloud", "brand": "New Balance", "sku": "M1906RXA", "image": "https://images.stockx.com/images/New-Balance-1906-Moonbeam-Raincloud-Product.jpg?fit=fill&bg=FFFFFF&w=700&h=500&fm=webp&auto=compress&q=90&dpr=2&trim=color&updated_at=1738193358", "min_price": 85, "avg_price": 110, "max_price": 160, "weekly_orders": 0, "rank": 10, "gender": "men", "colorway": "Silver Metallic", "release_date": "2023", "retail_price": 150, "release_year": "2023"},
+    ],
+    "count": 10,
+}
+
+
+def seed_popular_if_empty():
+    """인기 목록 캐시가 비어있으면 기본 데이터 시딩"""
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS popular_cache (
+                cache_key TEXT PRIMARY KEY,
+                data TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.commit()
+
+        cursor.execute('SELECT COUNT(*) as cnt FROM popular_cache')
+        row = cursor.fetchone()
+        if row['cnt'] == 0:
+            import hashlib
+            default_key = hashlib.md5(":::rank:asc:15".encode()).hexdigest()
+            cursor.execute('INSERT INTO popular_cache (cache_key, data) VALUES (?, ?)',
+                           (default_key, json.dumps(DEFAULT_POPULAR, ensure_ascii=False)))
+            conn.commit()
+            print("📋 기본 인기 목록 시딩 완료")
+
+        conn.close()
+    except Exception as e:
+        print(f"⚠️ 인기 목록 시딩 실패: {e}")

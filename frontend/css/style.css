@@ -873,6 +873,7 @@ body {
 
 .trending-list {
     display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
 }
 
@@ -1282,18 +1283,11 @@ body {
    그리드 레이아웃 (2~3열)
    ========================================= */
 
-.trending-list {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-}
-
 .trending-card {
     display: flex;
     flex-direction: column;
     gap: 12px;
     padding: 16px;
-    grid-template-columns: unset;
 }
 
 .trending-card-image {

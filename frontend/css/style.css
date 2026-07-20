@@ -1474,3 +1474,70 @@ body {
         z-index: 1000;
     }
 }
+
+/* =========================================
+   작동 원리 파이프라인 그리드
+   ========================================= */
+
+.pipeline {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    align-items: start;
+}
+
+.pipeline-arrow {
+    display: none;
+}
+
+.pipeline-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 24px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color 0.2s;
+}
+
+.pipeline-step:hover {
+    border-color: var(--primary);
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--gradient);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+}
+
+.step-content h4 {
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+}
+
+.step-content p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 1024px) {
+    .pipeline {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .pipeline {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

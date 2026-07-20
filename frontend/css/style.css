@@ -1373,3 +1373,47 @@ body {
         height: 280px;
     }
 }
+
+/* =========================================
+   최근 검색 히스토리
+   ========================================= */
+
+.search-history {
+    margin-top: 24px;
+}
+
+.search-history h4 {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.history-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.history-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.history-item:hover {
+    border-color: var(--primary);
+    color: var(--text-primary);
+}
+
+.history-item .history-price {
+    color: var(--primary-light);
+    font-weight: 600;
+}

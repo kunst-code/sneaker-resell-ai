@@ -853,7 +853,70 @@ function renderTrendingList(items) {
     }).join('');
 }
 
+// ========== 검색 히스토리 ==========
+let searchHistory = JSON.parse(localStorage.getItem('sneaker_search_history') || '[]');
+
+function addToHistory(item) {
+    const entry = {
+        sku: item.sku || item.style_code || '',
+        title: item.title || item.model_name || '',
+        price: item.min_price || item.price_usd || 0,
+        image: item.image || '',
+        timestamp: Date.now(),
+    };
+    if (!entry.sku && !entry.title) return;
+
+    // 중복 제거
+    searchHistory = searchHistory.filter(h => h.sku !== entry.sku);
+    searchHistory.unshift(entry);
+    searchHistory = searchHistory.slice(0, 10); // 최대 10개
+    localStorage.setItem('sneaker_search_history', JSON.stringify(searchHistory));
+    renderSearchHistory();
+}
+
+function renderSearchHistory() {
+    const container = document.getElementById('search-history');
+    if (!container || searchHistory.length === 0) {
+        if (container) container.innerHTML = '';
+        return;
+    }
+
+    container.innerHTML = `
+        <h4>🕐 최근 검색</h4>
+        <div class="history-list">
+            ${searchHistory.map(h => `
+                <div class="history-item" onclick="analyzeTrendingSneaker('${h.sku || h.title}')">
+                    <span>${h.title || h.sku}</span>
+                    ${h.price ? `<span class="history-price">$${h.price}</span>` : ''}
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function resetAnalyzer() {
+    // 결과 패널 리셋
+    resultPanel.innerHTML = `
+        <div class="result-placeholder">
+            <div class="placeholder-icon">🎯</div>
+            <p>분석 결과가 여기에 표시됩니다</p>
+        </div>
+    `;
+    analysisResults = [];
+    currentResultPage = 0;
+}
+
 function analyzeTrendingSneaker(skuOrName, itemData) {
+    // 이전 결과 리셋
+    resetAnalyzer();
+
+    // 히스토리에 추가
+    if (itemData) {
+        addToHistory(itemData);
+    } else {
+        addToHistory({ sku: skuOrName, title: skuOrName });
+    }
+
     // 데이터가 있으면 AI 없이 바로 표시
     if (itemData) {
         navigateTo('analyzer');
@@ -863,6 +926,9 @@ function analyzeTrendingSneaker(skuOrName, itemData) {
         navigateTo('analyzer');
     }
 }
+
+// 페이지 로드 시 히스토리 렌더링
+renderSearchHistory();
 
 function renderQuickResult(item) {
     const title = item.title || item.model_name || '';

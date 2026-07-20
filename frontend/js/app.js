@@ -706,6 +706,7 @@ async function loadTrendingSneakers() {
         const data = await response.json();
 
         if (data.success && data.trending && data.trending.length > 0) {
+            if (data.exchange_rate) window._exchangeRate = data.exchange_rate;
             renderTrendingList(data.trending);
         } else if (data.message || data.error) {
             trendingList.innerHTML = `
@@ -826,7 +827,7 @@ function renderTrendingList(items) {
 
         // 가격 표시 (StockX 기준)
         const priceMain = minPrice ? `$${minPrice}` : 'N/A';
-        const priceKRW = minPrice ? `₩${Math.round(minPrice * 1350).toLocaleString()}` : '';
+        const priceKRW = minPrice ? `₩${Math.round(minPrice * (window._exchangeRate || 1380)).toLocaleString()}` : '';
         const priceAvg = avgPrice ? `평균 $${Math.round(avgPrice)}` : '';
 
         return `
@@ -876,7 +877,7 @@ function renderQuickResult(item) {
     const year = item.release_year || (item.release_date ? item.release_date.slice(0, 4) : 'N/A');
     const releaseDate = item.release_date || '';
     const retailPrice = item.retail_price || 0;
-    const priceKRW = item.price_krw || (minPrice ? Math.round(minPrice * 1350) : 0);
+    const priceKRW = item.price_krw || (minPrice ? Math.round(minPrice * (window._exchangeRate || 1380)) : 0);
     const signal = item.buy_signal || '';
     const reason = item.reason || '';
     const trend = item.price_trend || '';

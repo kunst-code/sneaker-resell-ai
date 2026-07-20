@@ -170,7 +170,9 @@ def get_price_from_kicksdb(style_code: str) -> dict:
         min_price = product.get('min_price') or 0
         avg_price = product.get('avg_price') or 0
         max_price = product.get('max_price') or 0
-        exchange_rate = 1350
+
+        from services.exchange_rate import get_usd_krw
+        exchange_rate = get_usd_krw()
 
         # StockX 기준 가격 (USD)
         stockx_usd = min_price

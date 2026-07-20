@@ -45,6 +45,8 @@ def popular():
     kicksdb_result = get_trending_sneakers(limit=limit, brand=brand, gender=gender, sort=sort, order=order, size=size)
 
     if kicksdb_result.get('success') and kicksdb_result.get('trending'):
+        from services.exchange_rate import get_usd_krw
+        kicksdb_result['exchange_rate'] = get_usd_krw()
         _save_popular_cache(cache_key, kicksdb_result)
         return jsonify(kicksdb_result)
 

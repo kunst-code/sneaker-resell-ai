@@ -259,6 +259,10 @@ btnAnalyze.addEventListener('click', async () => {
 
     if (analysisResults.length > 0) {
         renderPaginatedResults();
+        // 결과 나온 후 검색창 리셋
+        styleCodeInput.value = '';
+        selectedFiles = [];
+        renderPreviews();
     } else {
         showError('분석 결과를 가져올 수 없습니다.');
     }
@@ -906,7 +910,7 @@ function renderSearchHistory() {
         <h4>🕐 최근 검색</h4>
         <div class="history-list">
             ${searchHistory.map(h => `
-                <div class="history-item" onclick="analyzeTrendingSneaker('${h.sku || h.title}')">
+                <div class="history-item" onclick="reSearchHistory('${h.sku || h.title}')">
                     <span>${h.title || h.sku}</span>
                     ${h.price ? `<span class="history-price">$${h.price}</span>` : ''}
                 </div>
@@ -925,6 +929,12 @@ function resetAnalyzer() {
     `;
     analysisResults = [];
     currentResultPage = 0;
+}
+
+function reSearchHistory(query) {
+    // 최근 검색 클릭 시 자동 분석 실행
+    styleCodeInput.value = query;
+    btnAnalyze.click();
 }
 
 function analyzeTrendingSneaker(skuOrName, itemData) {

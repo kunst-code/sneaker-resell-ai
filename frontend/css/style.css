@@ -875,8 +875,8 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
-    max-width: 1000px;
-    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .trending-loading {
@@ -1546,4 +1546,16 @@ body {
     .pipeline {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+
+/* 페이지 오버플로우 방지 */
+.page {
+    overflow-x: hidden;
+}
+
+#page-trending .container,
+#page-recommendations .container {
+    max-width: 1100px;
+    padding: 0 16px;
+    box-sizing: border-box;
 }

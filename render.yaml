@@ -1,18 +1,13 @@
 services:
   - type: web
     name: sneaker-resell-ai
-    runtime: python
-    buildCommand: |
-      pip install -r requirements.txt
-      playwright install chromium
-      playwright install-deps
-    startCommand: cd backend && gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120 --workers 2
+    runtime: docker
     envVars:
-      - key: PYTHON_VERSION
-        value: "3.11"
       - key: OPENAI_API_KEY
         sync: false
       - key: KICKSDB_API_KEY
         sync: false
       - key: RAPIDAPI_KEY
         sync: false
+      - key: PORT
+        value: "8000"

@@ -220,7 +220,7 @@ document.querySelectorAll('.sample-btn').forEach(btn => {
 
 // ========== 통합 분석 실행 (다중) ==========
 btnAnalyze.addEventListener('click', async () => {
-    const codes = styleCodeInput.value.trim().split(/[,，\s]+/).filter(c => c.length > 0);
+    const codes = styleCodeInput.value.trim().split(/[,，]+/).map(c => c.trim()).filter(c => c.length > 0);
     const size = document.getElementById('analyze-size').value;
 
     if (selectedFiles.length === 0 && codes.length === 0) {

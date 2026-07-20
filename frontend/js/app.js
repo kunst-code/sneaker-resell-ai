@@ -129,6 +129,7 @@ function renderWordCloud(keywords) {
         text.on('click', function(event, d) {
             const input = document.getElementById('style-code-input');
             if (input) input.value = d.text;
+            addToHistory({ sku: d.text, title: d.text });
             navigateTo('analyzer');
             // 자동으로 분석 실행
             setTimeout(() => btnAnalyze.click(), 300);
@@ -948,7 +949,7 @@ function analyzeTrendingSneaker(skuOrName, itemData) {
 }
 
 // 페이지 로드 시 히스토리 렌더링
-renderSearchHistory();
+setTimeout(renderSearchHistory, 100);
 
 async function runAiAnalysis(styleCode) {
     if (!styleCode) {

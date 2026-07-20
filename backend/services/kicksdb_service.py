@@ -87,6 +87,18 @@ def get_trending_sneakers(limit: int = 20, brand: str = None, gender: str = None
             products = _extract_data(response.json())
             trending = []
             for p in products:
+                # description에서 출시가/출시일 파싱
+                desc = p.get("description", "")
+                retail_price = 0
+                release_info = ""
+                import re as _re
+                retail_match = _re.search(r'retailed for \$(\d+)', desc)
+                if retail_match:
+                    retail_price = int(retail_match.group(1))
+                release_match = _re.search(r'released in (\w+ (?:of )?\d{4})', desc)
+                if release_match:
+                    release_info = release_match.group(1)
+
                 trending.append({
                     "id": p.get("id", ""),
                     "title": p.get("title", ""),
@@ -94,8 +106,9 @@ def get_trending_sneakers(limit: int = 20, brand: str = None, gender: str = None
                     "model": p.get("model", ""),
                     "sku": p.get("sku", ""),
                     "image": p.get("image", ""),
-                    "release_date": p.get("release_date", ""),
+                    "release_date": release_info or p.get("release_date", ""),
                     "release_year": (p.get("release_date") or "")[:4] or "N/A",
+                    "retail_price": retail_price,
                     "gender": p.get("gender", ""),
                     "min_price": p.get("min_price"),
                     "max_price": p.get("max_price"),

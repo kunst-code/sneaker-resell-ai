@@ -869,10 +869,13 @@ function renderQuickResult(item) {
     const sku = item.sku || item.style_code || '';
     const minPrice = item.min_price || item.price_usd || null;
     const avgPrice = item.avg_price || item.avg_price_usd || null;
+    const maxPrice = item.max_price || null;
     const weeklyOrders = item.weekly_orders || 0;
     const image = item.image || '';
     const colorway = item.colorway || '';
     const year = item.release_year || (item.release_date ? item.release_date.slice(0, 4) : 'N/A');
+    const releaseDate = item.release_date || '';
+    const retailPrice = item.retail_price || 0;
     const priceKRW = item.price_krw || (minPrice ? Math.round(minPrice * 1350) : 0);
     const signal = item.buy_signal || '';
     const reason = item.reason || '';
@@ -886,7 +889,8 @@ function renderQuickResult(item) {
             <div class="product-info-table">
                 <div class="product-info-row"><span class="product-info-label">모델 번호</span><span class="product-info-value">${sku}</span></div>
                 <div class="product-info-row"><span class="product-info-label">브랜드</span><span class="product-info-value">${brand}</span></div>
-                <div class="product-info-row"><span class="product-info-label">출시일</span><span class="product-info-value">${year}</span></div>
+                ${releaseDate ? `<div class="product-info-row"><span class="product-info-label">출시일</span><span class="product-info-value">${releaseDate}</span></div>` : ''}
+                ${retailPrice ? `<div class="product-info-row"><span class="product-info-label">출시가</span><span class="product-info-value">$${retailPrice}</span></div>` : ''}
             </div>
         </div>
         <div class="result-section">
@@ -894,9 +898,11 @@ function renderQuickResult(item) {
             <div class="info-grid">
                 ${minPrice ? `<div class="info-item"><div class="label">StockX 최저가</div><div class="value">$${minPrice}</div></div>` : ''}
                 ${avgPrice ? `<div class="info-item"><div class="label">StockX 평균가</div><div class="value">$${Math.round(avgPrice)}</div></div>` : ''}
-                ${priceKRW ? `<div class="info-item"><div class="label">원화 환산</div><div class="value">₩${priceKRW.toLocaleString()}</div></div>` : ''}
+                ${maxPrice ? `<div class="info-item"><div class="label">StockX 최고가</div><div class="value">$${maxPrice}</div></div>` : ''}
+                ${priceKRW ? `<div class="info-item"><div class="label">원화 환산 (최저)</div><div class="value">₩${priceKRW.toLocaleString()}</div></div>` : ''}
                 ${weeklyOrders ? `<div class="info-item"><div class="label">주간 거래량</div><div class="value">${weeklyOrders.toLocaleString()}건</div></div>` : ''}
             </div>
+            ${minPrice && maxPrice ? `<p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">사이즈별 가격 범위: $${minPrice} ~ $${maxPrice}</p>` : ''}
         </div>
         ${signal || trend || reason ? `
         <div class="result-section">

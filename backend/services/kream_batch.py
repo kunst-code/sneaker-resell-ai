@@ -46,8 +46,28 @@ def collect_kream_prices(sku_list: list) -> dict:
             page.goto("https://kream.co.kr", wait_until="domcontentloaded", timeout=15000)
             page.wait_for_timeout(3000)
 
+            consecutive_fails = 0
+
             for i, sku in enumerate(sku_list):
                 print(f"  [{i+1}/{len(sku_list)}] {sku} 검색 중...")
+
+                # 5개 연속 실패 시 브라우저 재시작 (차단 우회)
+                if consecutive_fails >= 3:
+                    print("    🔄 브라우저 재시작 (차단 우회)...")
+                    browser.close()
+                    time.sleep(random.uniform(30, 60))
+                    browser = p.chromium.launch(headless=True)
+                    context = browser.new_context(
+                        user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
+                        viewport={"width": 1440, "height": 900},
+                        locale="ko-KR",
+                    )
+                    page = context.new_page()
+                    stealth = Stealth()
+                    stealth.apply_stealth_sync(page)
+                    page.goto("https://kream.co.kr", wait_until="domcontentloaded", timeout=15000)
+                    page.wait_for_timeout(3000)
+                    consecutive_fails = 0
 
                 try:
                     price_data = _fetch_kream_price(page, sku)
@@ -55,17 +75,20 @@ def collect_kream_prices(sku_list: list) -> dict:
                         _save_kream_price(sku, price_data, today)
                         results.append(price_data)
                         print(f"    ✅ {price_data['name']}: {price_data['price']:,}원")
+                        consecutive_fails = 0
                     else:
                         errors.append(f"{sku}: 가격 없음")
                         print(f"    ⚠️ 가격 못 찾음")
+                        consecutive_fails += 1
                 except Exception as e:
                     errors.append(f"{sku}: {str(e)}")
                     print(f"    ❌ 에러: {e}")
+                    consecutive_fails += 1
 
-                # 안전 딜레이 (5~15초 랜덤)
+                # 안전 딜레이 (30~60초 — KREAM 차단 방지)
                 if i < len(sku_list) - 1:
-                    delay = random.uniform(5, 15)
-                    print(f"    ⏳ {delay:.1f}초 대기...")
+                    delay = random.uniform(30, 60)
+                    print(f"    ⏳ {delay:.0f}초 대기...")
                     time.sleep(delay)
 
             browser.close()
@@ -86,65 +109,58 @@ def collect_kream_prices(sku_list: list) -> dict:
 
 
 def _fetch_kream_price(page, sku: str) -> dict:
-    """단일 상품 KREAM 가격 조회"""
+    """단일 상품 KREAM 가격 조회 — 검색 결과 페이지에서 직접 추출 (빠름)"""
     # 검색
     search_url = f"https://kream.co.kr/search?keyword={sku}&tab=products"
     page.goto(search_url, wait_until="domcontentloaded", timeout=15000)
     page.wait_for_timeout(3000)
 
     content = page.content()
-    matches = re.findall(r'href="(/products/\d+)"', content)
 
-    if not matches:
+    # 상품 링크 확인
+    product_links = re.findall(r'href="(/products/\d+)"', content)
+    if not product_links:
         return None
 
-    # 상품 페이지
-    product_url = f"https://kream.co.kr{matches[0]}"
-    page.goto(product_url, wait_until="domcontentloaded", timeout=15000)
-    page.wait_for_timeout(3000)
-
-    content = page.content()
-
-    # 상품명
-    title = page.title()
-    name = title.split('|')[0].strip() if '|' in title else title
-
-    # 가격 추출
+    # 가격 추출 (여러 패턴 시도)
     current_price = 0
-    release_price = 0
 
-    # 할인가 (28% 221,000원)
-    discount_match = re.search(r'\d+%\s*([\d,]+)\s*원', content)
-    if discount_match:
-        current_price = int(discount_match.group(1).replace(',', ''))
+    # 패턴1: NNN,NNN원
+    prices_won = re.findall(r'(\d{2,3},\d{3})원', content)
+    if prices_won:
+        current_price = int(prices_won[0].replace(',', ''))
 
-    # 발매가
-    release_match = re.search(r'발매가\s*([\d,]+)\s*원', content)
-    if release_match:
-        release_price = int(release_match.group(1).replace(',', ''))
-
-    # 할인가 없으면 일반 가격
+    # 패턴2: 원 없이 쉼표 구분 숫자 (10,000 이상)
     if current_price == 0:
-        all_prices = re.findall(r'([\d,]+)\s*원', content)
-        for p in all_prices:
-            val = int(p.replace(',', ''))
-            if 10000 < val < 10000000 and val != release_price:
+        all_comma_numbers = re.findall(r'>(\d{2,3},\d{3})<', content)
+        for num in all_comma_numbers:
+            val = int(num.replace(',', ''))
+            if 10000 < val < 10000000:
                 current_price = val
                 break
 
-    # 거래량
-    trade_volume = 0
-    volume_match = re.search(r'최근\s*([\d,]+)건', content)
-    if volume_match:
-        trade_volume = int(volume_match.group(1).replace(',', ''))
+    # 패턴3: 만원 단위 (예: "22.1만")
+    if current_price == 0:
+        man_prices = re.findall(r'([\d.]+)만', content)
+        for mp in man_prices:
+            try:
+                val = int(float(mp) * 10000)
+                if 10000 < val < 10000000:
+                    current_price = val
+                    break
+            except:
+                pass
+
+    if current_price == 0:
+        return None
 
     return {
         "sku": sku,
-        "name": name,
+        "name": sku,
         "price": current_price,
-        "release_price": release_price,
-        "trade_volume": trade_volume,
-        "product_url": product_url,
+        "release_price": 0,
+        "trade_volume": 0,
+        "product_url": f"https://kream.co.kr{product_links[0]}",
     }
 
 
@@ -281,16 +297,23 @@ def get_target_skus() -> list:
     except Exception:
         pass
 
-    # 3. 기본 인기 품번 (한국 KREAM 인기 모델)
+    # 3. 기본 인기 품번 (한국 KREAM 검색에 최적화된 키워드)
+    # KREAM은 한글 모델명이나 짧은 품번으로 검색해야 매칭률 높음
     default_skus = [
-        'M992GR', 'U990GL6', 'M2002RXA', 'M1906AD',  # New Balance
-        'DD1391-100', 'DZ5485-612', 'FQ1759-002',      # Jordan
-        'DD1503-100', 'DD1503-101',                     # Nike Dunk Low
-        'CW2288-111',                                    # Air Force 1
-        '1201A019-108', '1202A164-020',                  # Asics
-        'IG7379', 'GY7403',                              # Adidas Samba/Gazelle
-        'L47288800',                                     # Salomon XT-6
-        'U992GY',                                        # NB 992 Grey
+        # New Balance (국내 인기 1위)
+        '뉴발란스 992', '뉴발란스 990v6', '뉴발란스 2002R',
+        '뉴발란스 1906', '뉴발란스 530',
+        # Nike / Jordan
+        '나이키 덩크 로우', '에어포스1', '조던1 로우',
+        '조던4', '덩크 로우 판다',
+        # Asics
+        '아식스 겔카야노14', '아식스 젤1130',
+        # Adidas
+        '아디다스 삼바', '아디다스 가젤',
+        # 기타
+        '살로몬 XT-6', '컨버스 척70',
+        # 콜라보/한정판
+        '트래비스 스캇', 'KAWS',
     ]
     skus.update(default_skus)
 

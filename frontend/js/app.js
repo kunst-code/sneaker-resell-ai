@@ -287,8 +287,8 @@ async function analyzeImageSingle(file) {
 async function analyzeCodeSingle(code, size) {
     const body = { style_code: code };
     if (size) body.size = size;
-    // AI 분석 사용하지 않음 (데이터만 반환)
-    body.use_ai = false;
+    // AI 분석 포함
+    body.use_ai = true;
     try {
         const response = await fetch(`${API_BASE}/recommend/analyze-by-code`, {
             method: 'POST',

@@ -187,10 +187,13 @@ def get_price_from_kicksdb(style_code: str) -> dict:
         return {"error": "KICKSDB_API_KEY가 설정되지 않았습니다."}
 
     try:
+        # 한글 → 영문 변환
+        translated_query, expected_brand = _translate_query(style_code)
+
         response = httpx.get(
             f"{KICKSDB_API_BASE}/stockx/products",
             headers=_headers(),
-            params={'query': style_code, 'limit': 5},
+            params={'query': translated_query, 'limit': 5},
             timeout=15.0
         )
 
@@ -200,6 +203,12 @@ def get_price_from_kicksdb(style_code: str) -> dict:
         products = _extract_data(response.json())
         if not products:
             return {"error": f"'{style_code}' 검색 결과 없음"}
+
+        # 브랜드 필터링
+        if expected_brand:
+            filtered = [p for p in products if expected_brand.lower() in (p.get('brand', '') or '').lower()]
+            if filtered:
+                products = filtered
 
         # SKU가 정확히 일치하는 상품 우선 선택
         product = None
